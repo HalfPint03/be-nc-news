@@ -1,7 +1,10 @@
 const express = require('express');
 const app = express();
-const getTopics = require('./controllers/get-topics')
+const {getTopics, getEndpoints} = require('./controllers/index')
 
 app.get('/api/topics', getTopics)
+
+app.get('/api', getEndpoints)
+
 
 module.exports = app;
