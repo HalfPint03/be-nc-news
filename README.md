@@ -1,7 +1,7 @@
 # Northcoders News API
-
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
-
+Add file .env.development=*databaseName* to create database
+Add file .env.test=*databaseName* to create test database
+gitignore both files
 
 
 --- 
