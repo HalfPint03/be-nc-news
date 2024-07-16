@@ -55,12 +55,12 @@ describe('/api/articles/:article_id', () => {
 
         })
     });
-    test('GET: if passed an invalid id number, responds with an empty object', () => {
+    test.only('GET: if passed an invalid id number, responds with an empty object', () => {
         return request(app)
         .get('/api/articles/100')
-        .expect(200)
+        .expect(404)
         .then(({body}) => {
-            expect(body.article).toEqual({})
+            expect(body.msg).toEqual('Not found')
         })
     });
     test('GET: if passed NAN, responds with an error', () => {
