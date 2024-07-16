@@ -55,7 +55,7 @@ describe('/api/articles/:article_id', () => {
 
         })
     });
-    test.only('GET: if passed an invalid id number, responds with an empty object', () => {
+    test('GET: if passed an invalid id number, responds with an empty object', () => {
         return request(app)
         .get('/api/articles/100')
         .expect(404)
@@ -71,4 +71,25 @@ describe('/api/articles/:article_id', () => {
             expect(body.msg).toEqual('Bad request')
         })
     });
+});
+
+describe('/api/articles', () => {
+    test('GET: responds with an array of all articles without body and added comment count', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body}) => {
+            body.articles.forEach((article) => {
+                expect(article).toHaveProperty('author')
+                expect(article).toHaveProperty('title')
+                expect(article).toHaveProperty('article_id')
+                expect(article).toHaveProperty('topic')
+                expect(article).toHaveProperty('created_at')
+                expect(article).toHaveProperty('votes')
+                expect(article).toHaveProperty('article_img_url')
+                expect(article).toHaveProperty('comment_count')
+                expect(article).not.toHaveProperty('body')
+            })
+        })
+    }); //errors???
 });
