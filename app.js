@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
-const {getTopics, getEndpoints, getArticleById, getAllArticles, getComments} = require('./controllers/index')
+const {getTopics, getEndpoints, getArticleById, getAllArticles, getComments, postComment} = require('./controllers/index')
+
+app.use(express.json())
 
 app.get('/api/topics', getTopics)
 
@@ -12,6 +14,7 @@ app.get('/api/articles', getAllArticles)
 
 app.get('/api/articles/:article_id/comments', getComments)
 
+app.post('/api/articles/:article_id/comments', postComment)
 
 app.use((err, req, res, next) => {
     if(err.code === '22P02'){
@@ -25,6 +28,16 @@ app.use((err, req, res, next) => {
         res.status(err.status).send({msg: err.msg})
     }
     next(err)
+})
+
+app.use((err, req, res, next) => {
+    if (err.status === 400){
+        res.status(err.status).send({msg: err.msg})
+    }
+})
+
+app.use((err, req, res, next) => {
+    res.status(500).send({msg: 'Server Error'})
 })
 
 module.exports = app;
