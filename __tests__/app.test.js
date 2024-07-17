@@ -14,7 +14,7 @@ afterAll(() => {
     return db.end();
 })
 
-describe('/api/topics', () => {
+describe('GET:200 /api/topics', () => {
     test('GET: responds with 200 and an array of topic objects with properties of slug and description', () => {
         return request(app)
         .get('/api/topics')
@@ -27,7 +27,7 @@ describe('/api/topics', () => {
         })
     });
 });
-describe('/api', () => {
+describe('GET:200 /api', () => {
     test('GET: responds with an object with all endpoints and info about them', () => {
         return request(app)
         .get('/api')
@@ -37,7 +37,7 @@ describe('/api', () => {
         })
     })
 });
-describe('/api/articles/:article_id', () => {
+describe('GET:200 /api/articles/:article_id', () => {
     test('GET: responds with an article object: author, title, article_id, body, topic, created_at, votes, article_img_url', () => {
         return request(app)
         .get('/api/articles/3')
@@ -73,7 +73,7 @@ describe('/api/articles/:article_id', () => {
         })
     });
 });
-describe('/api/articles', () => {
+describe('GET:200 /api/articles', () => {
     test('GET: responds with an array of all articles without body and added comment count', () => {
         return request(app)
         .get('/api/articles')
@@ -129,6 +129,14 @@ describe('GET:200: /api/articles/:article_id/comments', () => {
             expect(body.msg).toBe('Bad request')
         })
     });
+    test('GET: if passed an article_id that has no comments, responds with an empty array', () => {
+        return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then(({body}) => {
+            expect(body.comments).toEqual([])
+        })
+    });
 });
 describe('POST:201: /api/articles/:article_id/comments', () => {
     test('POST: accepts an object with username and body, responds with the posted comment', () => {
@@ -173,5 +181,44 @@ describe('POST:201: /api/articles/:article_id/comments', () => {
         .then(({body}) => [
             expect(body.msg).toBe('Bad request')
         ])
+    });
+});
+describe('PATCH: /apr/articles/:article_id', () => {
+    test('PATCH: takes an object with inc_votes, responds with specific article and its votes updated to the given value', () => {
+        return request(app)
+        .patch('/api/articles/1')
+        .send({inc_votes: 10})
+        .expect(200)
+        .then(({body}) => {
+            expect(body.article[0].votes).toBe(110)
+        })
+    });
+    test('PATCH: if passed an object with a - value, responds with specific article and its votes updated to a smaller value', () => {
+        return request(app)
+        .patch('/api/articles/1')
+        .send({inc_votes: -10})
+        .expect(200)
+        .then(({body}) => {
+            expect(body.article[0].votes).toBe(90)
+        })
+    });
+    test('PATCH: if passed an object without a value, responds with an error', () => {
+        return request(app)
+        .patch('/api/articles/1')
+        .send({})
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    });
+    test('PATCH: if passed an id that does not exist, responds with an error', () => {
+        return request(app)
+        .patch('/api/articles/100')
+        .send({inc_votes: 10})
+        .expect(404)
+        .then(({body}) => {
+            console.log(body)
+            expect(body.msg).toBe('Not found')
+        })
     });
 });

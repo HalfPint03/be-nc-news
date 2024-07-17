@@ -1,12 +1,17 @@
 const db = require('../db/connection')
+const fetchArticleById = require('../models/fetch-article-by-id')
 
 function fetchComments(id){
-    return db.query('SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at', [id])
+    const collectedComments = db.query('SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at', [id])
     .then((comments) => {
-        if(comments.rows.length === 0){
-            return Promise.reject({status: 404, msg: 'Not found'})
-        }
         return comments.rows
+    })
+    return Promise.all([fetchArticleById(id), collectedComments])
+    .then((result) => {
+        if(result[0].length > 0 && result[1].length === 0){
+            return []
+        }
+        return result[1]
     })
 }
 
