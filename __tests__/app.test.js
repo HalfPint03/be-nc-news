@@ -4,6 +4,7 @@ const db = require('../db/connection')
 const seed = require('../db/seeds/seed')
 const request = require('supertest')
 const endpoints = require('../endpoints.json')
+const sorted = require('jest-sorted')
 
 beforeEach(() => {
     return seed(testData)
@@ -55,7 +56,7 @@ describe('/api/articles/:article_id', () => {
 
         })
     });
-    test('GET: if passed an invalid id number, responds with an empty object', () => {
+    test('GET: if passed an invalid id number, responds with an error', () => {
         return request(app)
         .get('/api/articles/100')
         .expect(404)
@@ -79,6 +80,7 @@ describe('/api/articles', () => {
         .get('/api/articles')
         .expect(200)
         .then(({body}) => {
+            expect(body.articles).toBeSortedBy('created_at', {descending: true})
             body.articles.forEach((article) => {
                 expect(article).toHaveProperty('author')
                 expect(article).toHaveProperty('title')
@@ -92,4 +94,34 @@ describe('/api/articles', () => {
             })
         })
     }); //errors???
+});
+
+describe('/api/articles/:article_id/comments', () => {
+    test('GET: responds with an array of comments for the given article', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({body}) => {
+            expect(body.comments).toBeSortedBy('created_at')
+            body.comments.forEach((comment) => {
+                expect(comment.article_id).toBe(1)
+            })
+        })
+    });
+    test('GET: if passed an invalid number, responds with an error', () => {
+        return request(app)
+        .get('/api/articles/100/comments')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe('Not found')
+        })
+    });
+    test('GET: if passed nan, responds with an error', () => {
+        return request(app)
+        .get('/api/articles/ten/comments')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    });
 });
