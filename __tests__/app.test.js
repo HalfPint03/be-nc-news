@@ -73,7 +73,6 @@ describe('/api/articles/:article_id', () => {
         })
     });
 });
-
 describe('/api/articles', () => {
     test('GET: responds with an array of all articles without body and added comment count', () => {
         return request(app)
@@ -95,20 +94,26 @@ describe('/api/articles', () => {
         })
     }); //errors???
 });
-
-describe('/api/articles/:article_id/comments', () => {
+describe('GET:200: /api/articles/:article_id/comments', () => {
     test('GET: responds with an array of comments for the given article', () => {
         return request(app)
         .get('/api/articles/1/comments')
         .expect(200)
         .then(({body}) => {
-            expect(body.comments).toBeSortedBy('created_at')
-            body.comments.forEach((comment) => {
-                expect(comment.article_id).toBe(1)
+            if(body.comments.length > 0){
+                expect(body.comments).toBeSortedBy('created_at')
+                body.comments.forEach((comment) => {
+                    expect(comment).toHaveProperty('comment_id')
+                    expect(comment).toHaveProperty('votes')
+                    expect(comment).toHaveProperty('created_at')
+                    expect(comment).toHaveProperty('author')
+                    expect(comment).toHaveProperty('body')
+                    expect(comment.article_id).toBe(1)
             })
+            }
         })
     });
-    test('GET: if passed an invalid number, responds with an error', () => {
+    test('GET: if passed a number > the amount of comments, responds with an error', () => {
         return request(app)
         .get('/api/articles/100/comments')
         .expect(404)
@@ -123,5 +128,50 @@ describe('/api/articles/:article_id/comments', () => {
         .then(({body}) => {
             expect(body.msg).toBe('Bad request')
         })
+    });
+});
+describe('POST:201: /api/articles/:article_id/comments', () => {
+    test('POST: accepts an object with username and body, responds with the posted comment', () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({
+            username: 'rogersop',
+            body: 'Dave was a good man'
+        })
+        .expect(201)
+        .then(({body}) => {
+            expect(body.newComment[0].author).toBe('rogersop')
+            expect(body.newComment[0].body).toBe('Dave was a good man')
+            expect(body.newComment[0].article_id).toBe(2)
+            expect(body.newComment[0].votes).toBe(0)
+            expect(body.newComment[0].comment_id).toBe(19)
+        })
+    });
+    test('POST: if sent object is missing a body, responds with an error', () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({username: 'rogersop'})
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    });
+    test('POST: if sent object is missing a username, responds with an error', () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({body: 'no one here'})
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    });
+    test('POST: if sent an empty object, responds with an error', () => {
+        return request(app)
+        .post('/api/articles/2/comments')
+        .send({})
+        .expect(400)
+        .then(({body}) => [
+            expect(body.msg).toBe('Bad request')
+        ])
     });
 });
