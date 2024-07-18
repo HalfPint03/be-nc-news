@@ -181,7 +181,7 @@ describe("POST:201: /api/articles/:article_id/comments", () => {
       .then(({ body }) => [expect(body.msg).toBe("Bad request")]);
   });
 });
-describe("PATCH: /apr/articles/:article_id", () => {
+describe("PATCH:200 /apr/articles/:article_id", () => {
   test("PATCH:200 takes an object with inc_votes, responds with specific article and its votes updated to the given value", () => {
     return request(app)
       .patch("/api/articles/1")
@@ -238,7 +238,7 @@ describe("PATCH: /apr/articles/:article_id", () => {
       });
   });
 });
-describe("DELETE: /api/comments/comment_id", () => {
+describe("DELETE:204 /api/comments/comment_id", () => {
   test("DELETE:204 if passed a comment_id, responds with 204 and no content", () => {
     return request(app)
       .delete("/api/comments/1")
@@ -263,4 +263,18 @@ describe("DELETE: /api/comments/comment_id", () => {
         expect(body.msg).toBe('Bad request')
       })
   });
+});
+describe('GET:200 /api/users', () => {
+    test('GET:200 responds with all users', () => {
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then(({body}) => {
+            body.users.forEach((user) => {
+                expect(user).toHaveProperty('username')
+                expect(user).toHaveProperty('name')
+                expect(user).toHaveProperty('avatar_url')
+            })
+    })
+    });
 });
