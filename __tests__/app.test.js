@@ -279,7 +279,7 @@ describe('GET:200 /api/users', () => {
     });
 });
 describe('GET:200 Sorting queries /api/articles', () => {
-    test('GET:200 uses both default values, responds with an array of articles', () => {
+    test('GET:200 uses both default values of sort_by and order, responds with an array of articles', () => {
         return request(app)
         .get('/api/articles')
         .expect(200)
@@ -298,7 +298,7 @@ describe('GET:200 Sorting queries /api/articles', () => {
         });
         })
     });
-    test('GET:200 given sort by', () => {
+    test('GET:200 if given sort by, responds with an array sorted in that order descending', () => {
         return request(app)
         .get('/api/articles?sort_by=author')
         .expect(200)
@@ -306,7 +306,7 @@ describe('GET:200 Sorting queries /api/articles', () => {
             expect(body.articles).toBeSortedBy('author', {descending: true})
         })
     });
-    test('GET:200 given order', () => {
+    test('GET:200 if given order, responds with an array sorted by default ordered by order', () => {
         return request(app)
         .get('/api/articles?order=ASC')
         .expect(200)
@@ -314,7 +314,7 @@ describe('GET:200 Sorting queries /api/articles', () => {
             expect(body.articles).toBeSortedBy('created_at', {descending: false})
         })
     });
-    test('GET:200 given both', () => {
+    test('GET:200 if given both sort_by and order, responds with an array sorted by sort_by and ordered by order', () => {
         return request(app)
         .get('/api/articles?sort_by=title&order=ASC')
         .expect(200)
@@ -322,7 +322,7 @@ describe('GET:200 Sorting queries /api/articles', () => {
             expect(body.articles).toBeSortedBy('title', {descending:false})
         })
     });
-    test('GET:400 invalid sort by', () => {
+    test('GET:400 if given an invalid sort_by value, responds with an error', () => {
         return request(app)
         .get('/api/articles?sort_by=age')
         .expect(400)
@@ -330,7 +330,7 @@ describe('GET:200 Sorting queries /api/articles', () => {
             expect(body.msg).toBe('Bad request')
         })
     });
-    test('GET:400 invalid order', () => {
+    test('GET:400 if given an invalid order value, responds with an error', () => {
         return request(app)
         .get('/api/articles?order=up')
         .expect(400)
