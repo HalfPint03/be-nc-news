@@ -339,3 +339,14 @@ describe('GET:200 Sorting queries /api/articles', () => {
         })
     });
 });
+// describe('GET:200 Topic query /api/articles', () => {
+//     test.only('GET:200 if passed a topic, responds with an array of articles with that given topic', () => {
+//         return request(app)
+//         .get('/api/articles?topic=mitch')
+//         .expect(200)
+//         .then(({body}) => {
+//             body.articles.forEach((article) => 
+//             expect(article.topic).toBe('mitch'))
+//         })
+//     });
+// });
