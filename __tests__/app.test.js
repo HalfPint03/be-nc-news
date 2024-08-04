@@ -339,14 +339,30 @@ describe('GET:200 Sorting queries /api/articles', () => {
         })
     });
 });
-// describe('GET:200 Topic query /api/articles', () => {
-//     test.only('GET:200 if passed a topic, responds with an array of articles with that given topic', () => {
-//         return request(app)
-//         .get('/api/articles?topic=mitch')
-//         .expect(200)
-//         .then(({body}) => {
-//             body.articles.forEach((article) => 
-//             expect(article.topic).toBe('mitch'))
-//         })
-//     });
-// });
+describe('GET:200 Topic query /api/articles', () => {
+    test('GET:200 if passed a topic, responds with an array of articles with that given topic', () => {
+        return request(app)
+        .get('/api/articles?topic=mitch')
+        .expect(200)
+        .then(({body}) => {
+            body.articles.forEach((article) => 
+            expect(article.topic).toBe('mitch'))
+        })
+    });
+    test('GET:200 if passed a valid topic with no articles, responds with an empty array', () => {
+      return request(app)
+      .get('/api/articles?topic=paper')
+      .expect(200)
+      .then(({body}) => {
+        expect(body.articles).toEqual([])
+      })
+    });
+    test('GET:404 if passed a value that is not a topic, responds with an error', () => {
+      return request(app)
+      .get('/api/articles?topic=ihatesql')
+      .expect(404)
+      .then(({body}) => {
+        expect(body.msg).toBe('Not found')
+      })
+    });
+});
