@@ -44,11 +44,10 @@ app.use((err, req, res, next) => {
     if (err.status === 400){
         res.status(err.status).send({msg: err.msg})
     }
-    next(err    )
+    next(err)
 })
 
 app.use((err, req, res, next) => {
-    console.log(err)
     res.status(500).send({msg: 'Server Error'})
 })
 
